@@ -16,6 +16,10 @@ var suffixList = []string{
 	"Cargo.toml",
 	".git",
 	"package.json",
+	"node_modules",
+	".terraform",
+	".terragrunt-cache",
+	".direnv",
 }
 var projectPaths = mapset.NewSet[string]()
 
