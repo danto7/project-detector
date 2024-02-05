@@ -1,15 +1,12 @@
 package main
 
 import (
-	"cmp"
 	"fmt"
 	"io/fs"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
-	"slices"
-	"strings"
 
 	mapset "github.com/deckarep/golang-set/v2"
 )
@@ -22,6 +19,7 @@ var suffixList = []string{
 	".terraform",
 	".terragrunt-cache",
 	".direnv",
+	"go.mod",
 }
 var projectPaths = mapset.NewSet[string]()
 
@@ -58,7 +56,10 @@ func main() {
 		for _, suffix := range suffixList {
 			if filepath.Base(subPath) == suffix {
 				parentPath := path.Join(pathname, path.Dir(subPath))
-				projectPaths.Add(parentPath)
+				if !projectPaths.Contains(parentPath) {
+					fmt.Println(parentPath)
+					projectPaths.Add(parentPath)
+				}
 				return fs.SkipDir
 			}
 		}
@@ -68,13 +69,13 @@ func main() {
 		return nil
 	})
 
-	paths := projectPaths.ToSlice()
-	slices.SortFunc(paths, func(a, b string) int {
-		return cmp.Compare(strings.Count(a, "/"), strings.Count(b, "/"))
-	})
-	for _, path := range paths {
-		fmt.Println(path)
-	}
+	// paths := projectPaths.ToSlice()
+	// slices.SortFunc(paths, func(a, b string) int {
+	// 	return cmp.Compare(strings.Count(a, "/"), strings.Count(b, "/"))
+	// })
+	// for _, path := range paths {
+	// 	fmt.Println(path)
+	// }
 }
 
 func usage() {
